@@ -125,6 +125,7 @@ const App = (props) => {
 
   const [left, setLeft] = useState(0)
   const [right, setRight] = useState(0)
+  const [allClicks, setAll] = useState([])
 
   const [clicks, setClicks] = useState({
     lefts: 0, rights: 0
@@ -134,12 +135,15 @@ const App = (props) => {
 
   const handleRightClicks = () => setClicks({...clicks, rights:clicks.rights+1})
   
-  const handleLeftClick = () => setLeft(left+1)
-
-  const handleRightClick = () =>{
-
+  const handleLeftClick = () => {
+    setAll(allClicks.concat('L'))
+    setLeft(left+1)
   }
-  
+
+  const handleRightClick = () => {
+    setAll(allClicks.concat('R'))
+    setRight(right+1)
+  }
 
   return (
     <div>
@@ -150,9 +154,10 @@ const App = (props) => {
       <div>
       {left}
       <button onClick={handleLeftClick}>Left</button>
-      <button onClick={() => setRight(right+1)}>right</button>
+      <button onClick={handleRightClick}>right</button>
       {right}
       </div>
+      <div>{allClicks.join(' ')}</div>
       <button onClick={increase}>
         plus {counter}
       </button >
