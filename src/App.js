@@ -72,6 +72,18 @@ const Button = ({onClick, text}) => <button onClick = {onClick}>{text}</button>
 //   )
 // }
 
+const History = ({allClicks}) =>{
+  if (allClicks.length == 0) {
+    return(
+      <div>The application is used when the buttons are clicked</div>
+    )
+  }
+
+return(
+  <div> button press history: {allClicks.join('')}</div>
+)
+}
+
 const App = (props) => {
 
   // const courses = 'Half Stack application development'
@@ -151,13 +163,14 @@ const App = (props) => {
       <button onClick={handleLeftClicks}>lefts</button>
       <button onClick={handleRightClicks}>rights</button>
       {clicks.rights} </div>
+      <History allClicks={allClicks}/>
       <div>
       {left}
       <button onClick={handleLeftClick}>Left</button>
       <button onClick={handleRightClick}>right</button>
       {right}
       </div>
-      <div>{allClicks.join(' ')}</div>
+      
       <button onClick={increase}>
         plus {counter}
       </button >
