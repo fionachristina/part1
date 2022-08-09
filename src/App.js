@@ -52,6 +52,26 @@ const Hi = ({name, age}) =>{
 
 }
 
+// const Display = (props) =>{
+//   return(
+//     <div>
+//       {props.counter}
+//     </div>
+//   )
+// }
+
+const Display = ({counter}) => <div>{counter}</div>
+
+const Button = ({onClick, text}) => <button onClick = {onClick}>{text}</button>
+
+// const Button = (props) =>{
+//   return(
+//     <button onClick={props.onClick}>
+//     {props.text}
+//     </button>
+//   )
+// }
+
 const App = (props) => {
 
   // const courses = 'Half Stack application development'
@@ -65,6 +85,8 @@ const App = (props) => {
   const [counter, setCounter] = useState(0)
 
   const increase = () => setCounter(counter + 1)
+
+  const decrease = () => setCounter(counter - 1)
 
   const reset = () => setCounter(0)
 
@@ -101,9 +123,36 @@ const App = (props) => {
     console.log('clicked')
   }
 
+  const [left, setLeft] = useState(0)
+  const [right, setRight] = useState(0)
+
+  const [clicks, setClicks] = useState({
+    lefts: 0, rights: 0
+  })
+
+  const handleLeftClicks = () => setClicks({...clicks, lefts:clicks.lefts+1})
+
+  const handleRightClicks = () => setClicks({...clicks, rights:clicks.rights+1})
+  
+  const handleLeftClick = () => setLeft(left+1)
+
+  const handleRightClick = () =>{
+
+  }
+  
+
   return (
     <div>
-
+      <div> {clicks.lefts} 
+      <button onClick={handleLeftClicks}>lefts</button>
+      <button onClick={handleRightClicks}>rights</button>
+      {clicks.rights} </div>
+      <div>
+      {left}
+      <button onClick={handleLeftClick}>Left</button>
+      <button onClick={() => setRight(right+1)}>right</button>
+      {right}
+      </div>
       <button onClick={increase}>
         plus {counter}
       </button >
@@ -113,6 +162,10 @@ const App = (props) => {
 
     
       {/* <div>{counter}</div> */}
+      <Display counter={counter}/>
+      <Button onClick={increase} text='Plus'/>
+      <Button onClick= {reset} text='Reset'/>
+      <Button onClick={decrease} text='Minus'/>
       <Hi name = {name} age = {age}/>
       <Hello name = {name} age = {age}/>
       <Hello name="Maya" age={26 + 10} />
