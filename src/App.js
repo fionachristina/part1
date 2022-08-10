@@ -170,11 +170,22 @@ const App = (props) => {
         'Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.',
         'Programming without an extremely heavy use of console.log is same as if a doctor would refuse to use x-rays or blood tests when diagnosing patients.'
       ]
-      const [selected, setSelected] = useState(0)
+  const [selected, setSelected] = useState(0)
+  const [vote, setVote] = useState({ 0:0, 1:3, 2:0, 3:0, 4:0, 5:0, 6:0 })
+  const random = (min, max) => {
+    min = Math.ceil(0)
+    max = Math.floor(6)
+    return Math.floor(Math.random() * (max - min+1)+min)
+  }
+
   return (
     <div>
       <div>
         <h1>Anecdotes</h1>
+        <div>{vote[selected]}</div>
+        {anecdotes[selected]}
+        <Buttons text='vote' onClick={() => setVote(Number(vote[selected]) + 1)}/>
+        <Buttons text='next anecdote'onClick={() => setSelected(random)}/>
         <h1>{title}</h1>
       <Buttons onClick={() => setGood(good + 1)} text='good'/>
       <Buttons onClick={() => setNeutral(neutral + 1)} text = 'neutral'/>
