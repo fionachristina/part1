@@ -6,6 +6,9 @@ const Header = (course) =>{
     </>
   )
 }
+
+console.log('part2')
+
 const Content = (parts) =>{
   return (
     <>
