@@ -173,6 +173,8 @@ const App = (props) => {
   const [selected, setSelected] = useState(0)
   const [vote, setVote] = useState({ 0:0, 1:3, 2:0, 3:0, 4:0, 5:0, 6:0 })
   const random = (min, max) => {
+  
+    
     min = Math.ceil(0)
     max = Math.floor(6)
     return Math.floor(Math.random() * (max - min+1)+min)
