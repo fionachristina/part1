@@ -103,16 +103,103 @@ const App = (props ) => {
 
 const total = course.parts.reduce((sum, part) => {
   sum = sum + part.exercises
-  console.log('Sum', sum, part)
+  // console.log('Sum', sum, part)
   return sum 
 },0)
 
+const [person, setPerson] = useState([{
+  name:'Arto Hellas',
+  number: '1234'
+}])
+
+const [newName, setNewName] =useState('')
+
+const [newNumber, setNewNumber] = useState('')
+
+const [filter, setFilter] = useState('a')
+
+const personArray = person.map(p => p.name)
+
+const addPerson = (event) =>{
+  event.preventDefault()
+  const personObject ={
+    name: newName,
+    number: newNumber 
+  }
+
+  if (personArray.includes(personObject.name)){
+    alert( `${newName} is already added to phonebook`)
+  }
+  else{
+    setPerson(person.concat(personObject))
+  }
+
+  setNewName('')
+  setNewNumber('')
+  
+}
+
+const handleNewPerson = (event) =>{
+  console.log(event.target.value)
+  setNewName(event.target.value)
+
+}
+
+const handleNewNumber = (event) =>{
+  console.log(event.target.value)
+  setNewNumber(event.target.value)
+
+}
+
+const handleFilterChange = (event) =>{
+  console.log(event.target.value)
+  setFilter(event.target.value)
+}
+
   return (
     <div>
-      
-      <Course course={course} />
+      <h2>PhoneBook</h2>
+      <form onSubmit={addPerson}>
+        <div>
+          name: <input
+          value={newName}
+          onChange={handleNewPerson} 
+          />
+          <div>
+            number: <input 
+            value={newNumber}
+            onChange={handleNewNumber} 
+            />
+          </div>
+        </div>
+        <div>
+          <button type = 'submit'>add</button>
+        </div>
+        <h2>Numbers</h2>
 
-      <h1>Notes</h1>
+        <ul>
+          {person.map((pers, i) => <li key={'person'+i}>{pers.name} {pers.number}</li>)}
+        </ul>
+         
+        <div>
+          <h2>Filter</h2>
+          <div>
+           Filter shown with <input 
+           value={filter}
+           onChange={handleFilterChange}
+           />
+          </div>
+        {personArray.filter(person => person.includes(filter)).map(filteredName => (
+        <li>
+          {filteredName}
+        </li>
+      ))}
+    </div>
+      </form>
+     
+      {/* <Course course={course} /> */}
+
+      {/* <h1>Notes</h1> */}
 
       {/* <ul>
         {notes.map((note) => 
@@ -121,7 +208,7 @@ const total = course.parts.reduce((sum, part) => {
         </li>)}
       </ul> */}
 
-      <ul>
+      {/* <ul>
         {notes.map(note => 
         <Notes key = {note.id} note={note}/>
         )}
@@ -133,7 +220,7 @@ const total = course.parts.reduce((sum, part) => {
           onChange={hanndleNoteChange}
           />
           <button type='submit'>save</button>
-      </form>
+      </form> */}
 
      
     </div>
