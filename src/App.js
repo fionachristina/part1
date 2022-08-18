@@ -1,5 +1,6 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Notes from './components/Note'
+import axios from 'axios'
 
 const Header = (props) =>{
   return(
@@ -49,8 +50,8 @@ const Course = (props) =>{
 
 const App = (props ) => {
 
-  const [notes, setNotes] = useState(props.notes)
-
+  //const [notes, setNotes] = useState(props.notes)
+  const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState(
     'a new note...'
     )
@@ -156,8 +157,19 @@ const handleFilterChange = (event) =>{
   setFilter(event.target.value)
 }
 
+useEffect(() => {
+  console.log('effect')
+  axios
+    .get('http://localhost:3001/notes')
+    .then(response => {
+      console.log('promise fulfilled')
+      setNotes(response.data)
+    })
+}, [])
+
   return (
     <div>
+ 
       <h2>PhoneBook</h2>
       <form onSubmit={addPerson}>
         <div>
@@ -189,12 +201,16 @@ const handleFilterChange = (event) =>{
            onChange={handleFilterChange}
            />
           </div>
-        {personArray.filter(person => person.includes(filter)).map(filteredName => (
-        <li>
+        {personArray
+          .filter((person,i) => person
+          .includes(filter))
+          .map((filteredName,i) => (
+        <li key={i}>
           {filteredName}
         </li>
       ))}
     </div>
+    
       </form>
      
       {/* <Course course={course} /> */}
