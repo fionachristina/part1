@@ -55,6 +55,7 @@ const App = (props ) => {
   const [newNote, setNewNote] = useState(
     'a new note...'
     )
+  const [people, setPeople] = useState([])
   
   const addNote = (event) =>{
     event.preventDefault()
@@ -157,19 +158,32 @@ const handleFilterChange = (event) =>{
   setFilter(event.target.value)
 }
 
+// useEffect(() => {
+//   console.log('effect')
+//   axios
+//     .get('http://localhost:3001/notes')
+//     .then(response => {
+//       console.log('promise fulfilled')
+//       setNotes(response.data)
+//     })
+// }, [])
+
+
+
 useEffect(() => {
   console.log('effect')
   axios
-    .get('http://localhost:3001/notes')
-    .then(response => {
-      console.log('promise fulfilled')
-      setNotes(response.data)
-    })
-}, [])
+.get('http://localhost:3001/persons')
+.then(response =>{
+  console.log('promise fulfilled')
+  setPeople(response.data)
 
+})
+}, [])
+console.log(people)
   return (
     <div>
- 
+    
       <h2>PhoneBook</h2>
       <form onSubmit={addPerson}>
         <div>
