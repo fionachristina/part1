@@ -1,74 +1,36 @@
 import { useState, useEffect } from 'react'
 import Notes from './components/Note'
+import Numbers from './components/Phonebook'
+import noteService from './services/notes'
+import personService from './services/phonebook'
+import Footer from './components/Footer'
+import DetailedCountry from './components/DetailedCountry'
 import axios from 'axios'
-
-const Header = (props) =>{
-  return(
-    <div>
-      <h1>{props.course.name}</h1>
-    </div>
-  )
-
-}
-
-const Part =(props) =>{
-  return(
-    <div>{props.name} {props.exercises}</div>
-  )
-}
-
-const Content = (props) =>{
-  return(
-    <div>
-    {props.course.parts.map(part => <Part key={part.id} name={part.name} exercises={part.exercises}/>)}
-    </div>
-  )
-}
-
-const Total = (props) =>{
-  const parts = props.course.parts.map(course => course.exercises)
-  return (
-    
-    <div>
-<p>Total of {parts.reduce((s, p) => s + p)} exercises</p>
-    </div>
-    
-  )
-}
-
-const Course = (props) =>{
-  return(
-    <div>
-      <Header course={props.course}/>
-      <Content  course={props.course}/>
-      <Total  course={props.course}/>
-    </div>
-  )
-
-}
-
 
 const App = (props ) => {
 
-  //const [notes, setNotes] = useState(props.notes)
+  //NOTES.....
   const [notes, setNotes] = useState([])
   const [newNote, setNewNote] = useState(
     'a new note...'
     )
-  const [people, setPeople] = useState([])
+  
+  const [errorMessage, setErrorMessage] = useState('some error happened...')
   
   const addNote = (event) =>{
     event.preventDefault()
     const noteObject = {
-      id: notes.length +1 ,
       content: newNote,
-      date: new Date().toISOString(),
+      date: new Date(),
       important: Math.random() < 0.5
     }
 
-    setNotes(notes.concat(noteObject))
-    setNewNote('')
-    console.log('button clicked ', event.target)
+    noteService
+    .create(noteObject)
+    .then(returnedNote=> {
+      setNotes(notes.concat(returnedNote))
+      setNewNote('')
+    })
  }
 
  const hanndleNoteChange = (event) => {
@@ -76,43 +38,50 @@ const App = (props ) => {
   setNewNote(event.target.value)
  }
 
- const course = {
-  id: 1,
-  name: 'Half Stack application development',
-  parts: [
-    {
-      name: 'Fundamentals of React',
-      exercises: 10,
-      id: 1
-    },
-    {
-      name: 'Using props to pass data',
-      exercises: 7,
-      id: 2
-    },
-    {
-      name: 'State of a component',
-      exercises: 14,
-      id: 3
-    },
-    {
-      name: 'Redux',
-      exercises: 11,
-      id: 4
-    }
-  ]
+useEffect(() => {
+  noteService
+  .getAll()
+  .then(initialNotes =>{
+    setNotes(initialNotes)
+  }
+ )
+}, [])
+
+const toggleImportanceOf = (id) => { 
+  const note = notes.find(n => n.id === id)
+  console.log(note)
+  const changedNote = {...note, important: !note.important}
+
+noteService
+.update(id, changedNote)
+.then(returnedNote => {
+  setNotes(notes.map(n => n.id !== id 
+    ? n
+    : returnedNote
+    ))
+})
+.catch(error => {
+  setErrorMessage(`The note ${note.content} was already removed from the server`)
+  setTimeout(() => {
+    setErrorMessage(null)
+  }, 5000);
+  setNotes(notes.filter(n => n.id !== id))
+})
 }
 
-const total = course.parts.reduce((sum, part) => {
-  sum = sum + part.exercises
-  // console.log('Sum', sum, part)
-  return sum 
-},0)
+const NoteNotification = ({message}) =>{
+  if (message === null){
+    return null;
+  }
 
-const [person, setPerson] = useState([{
-  name:'Arto Hellas',
-  number: '1234'
-}])
+  return(
+    <div className='error'>
+      {message}
+    </div>
+  )
+}
+//PEOPLE.....
+const [person, setPerson] = useState([])
 
 const [newName, setNewName] =useState('')
 
@@ -120,37 +89,78 @@ const [newNumber, setNewNumber] = useState('')
 
 const [filter, setFilter] = useState('a')
 
-const personArray = person.map(p => p.name)
+const [personMessage, setPersonMessage] = useState('Person notification...')
 
-const addPerson = (event) =>{
-  event.preventDefault()
-  const personObject ={
-    name: newName,
-    number: newNumber 
+const PersonNotification = ({personMessage}) =>{
+  if (personMessage === null){
+   return null
   }
+  return(
+   <div className='errorNumbers'>
+     {personMessage}
+   </div>
+  )
+ }
 
-  if (personArray.includes(personObject.name)){
-    alert( `${newName} is already added to phonebook`)
+const addPerson = (event, id) =>{
+event.preventDefault()
+  const personObject ={
+      name: newName,
+      number: newNumber 
+    }
+
+  const no = person.find(p => p.name === newName)
+  const changedPerson = {...no, number: newNumber}
+
+  if (person.map(p => p.name).includes(personObject.name)){
+    window.confirm( `${newName} is already added to phonebook, replace the old number with new one?`)
+    ? personService
+      .updatePersons(no.id, changedPerson)
+      .then(returnedPerson =>{
+        setPerson(person.map(p=> p.id !== no.id
+        ? p
+        : returnedPerson
+        ))
+        setPersonMessage(
+          `${newNumber} has replaced ${no.number} for ${no.name}`
+         )
+         setTimeout(() => {
+          setPersonMessage(null)
+         }, 5000);
+      })
+      .catch(error =>{ 
+        alert(`error occured when updating`)
+      })
+    : alert(`${newName}'s number has not been replaced`)
   }
   else{
-    setPerson(person.concat(personObject))
+    personService
+    .createPerson(personObject)
+    .then(returnedPerson => {
+      setPerson(person.concat(returnedPerson))
+      setPersonMessage(
+        `${newName} has been added`
+      )
+      setTimeout(() => {
+        setPersonMessage(null)
+      }, 5000);
+    })
+    .catch(error =>{
+      alert(`error occured when adding`)
+    })
   }
-
   setNewName('')
   setNewNumber('')
-  
 }
 
 const handleNewPerson = (event) =>{
   console.log(event.target.value)
   setNewName(event.target.value)
-
 }
 
 const handleNewNumber = (event) =>{
   console.log(event.target.value)
   setNewNumber(event.target.value)
-
 }
 
 const handleFilterChange = (event) =>{
@@ -158,33 +168,91 @@ const handleFilterChange = (event) =>{
   setFilter(event.target.value)
 }
 
-// useEffect(() => {
-//   console.log('effect')
-//   axios
-//     .get('http://localhost:3001/notes')
-//     .then(response => {
-//       console.log('promise fulfilled')
-//       setNotes(response.data)
-//     })
-// }, [])
+const deletePhoneId = (id) => {
 
-
+  const pers = person.find(p => p.id === id)
+  console.log(id)
+  
+  personService
+  .deletePersonWithId(id)
+  .then(returnedPerson => {
+    setPerson(person.filter(currentPerson => currentPerson.id !== id))
+    setPersonMessage(
+      `${pers.name} deleted`
+    )
+    setTimeout(() => {
+      setPersonMessage(null)
+    }, 5000);
+  })
+  .catch(error => {
+    alert(`${pers.name} was already deleted`)
+  })
+}
 
 useEffect(() => {
-  console.log('effect')
-  axios
-.get('http://localhost:3001/persons')
-.then(response =>{
-  console.log('promise fulfilled')
-  setPeople(response.data)
+  personService
+.getAllPersons()
+.then(allPeople =>{
+
+  setPerson(allPeople)
 
 })
 }, [])
-console.log(people)
+
+//console.log(person)
+
+//COUNTRIES.....
+
+const [countryInput, setCountryInput] = useState('a')
+
+const [countries, setCountries] = useState([])
+
+const [countriesData, setCountriesData] = useState([])
+
+const [searchResults, setSearchResults] = useState([])
+
+const handleCountries = (event) =>{
+  event.preventDefault()
+  console.log(event.target.value)
+  setCountryInput(event.target.value)
+}
+
+useEffect(() => {
+  axios
+  .get('https://restcountries.com/v3.1/all')
+  .then(response => 
+    setCountries(response.data)
+    )
+}, [])
+
+useEffect(() => {
+  let data = countries.map(country => 
+    {return {
+    countryName: country.name,
+    countryLanguage: country.languages,
+    countryCapital: country.capital,
+    countryArea: country.area,
+    countryFlag: country.flag
+  }})
+
+  setCountriesData(data)
+}, [countries])
+
+useEffect(() =>{
+  setSearchResults(countriesData
+  .filter((country, i) => {
+    console.log(country)
+    return country.countryName.common.toLowerCase().includes(countryInput)
+  }))
+}, [countryInput]) //monitoring country input
+
+console.log(countriesData)
+
   return (
     <div>
     
-      <h2>PhoneBook</h2>
+      <h1>PhoneBook</h1>
+  <PersonNotification personMessage={personMessage}/>
       <form onSubmit={addPerson}>
         <div>
           name: <input
@@ -201,12 +269,17 @@ console.log(people)
         <div>
           <button type = 'submit'>add</button>
         </div>
-        <h2>Numbers</h2>
-
+        </form>
+        <h1>Numbers</h1>
         <ul>
-          {person.map((pers, i) => <li key={'person'+i}>{pers.name} {pers.number}</li>)}
-        </ul>
-         
+        {person
+        .map(p => <Numbers 
+        key = {p.id} 
+        persons={p}
+        deletePhone = {() => deletePhoneId(p.id)}
+        />
+        )}
+      </ul> 
         <div>
           <h2>Filter</h2>
           <div>
@@ -215,32 +288,33 @@ console.log(people)
            onChange={handleFilterChange}
            />
           </div>
-        {personArray
+        {person
+          .map(p => p.name)
           .filter((person,i) => person
+          .toLowerCase()
           .includes(filter))
           .map((filteredName,i) => (
-        <li key={i}>
-          {filteredName}
-        </li>
+            <li key={i}>
+              {filteredName}
+            </li>
       ))}
     </div>
     
-      </form>
+  
      
       {/* <Course course={course} /> */}
 
-      {/* <h1>Notes</h1> */}
+      <h1>Notes</h1>
 
-      {/* <ul>
-        {notes.map((note) => 
-        <li key = {note.id}>
-          {note.content}
-        </li>)}
-      </ul> */}
+      <NoteNotification message={errorMessage}/>
 
-      {/* <ul>
+      <ul>
         {notes.map(note => 
-        <Notes key = {note.id} note={note}/>
+        <Notes 
+        key = {note.id} 
+        note={note}
+        toggleImportance = {() => toggleImportanceOf(note.id)}
+        />
         )}
       </ul>
 
@@ -250,9 +324,33 @@ console.log(people)
           onChange={hanndleNoteChange}
           />
           <button type='submit'>save</button>
-      </form> */}
+      </form>
+       <div>
+      <h1>Countries</h1>
+      find countries <input 
+      value={countryInput}
+      onChange={handleCountries}
+      />
+{/* 
+      {searchResults.length < 10 
+      ? <div> Less than 10 </div> 
+      : searchResults.length < 20 
+      ? <div> less than 20 </div> 
+      : <div> more than 20 </div>} */}
 
-     
+      {searchResults.length < 10 && searchResults.length > 1
+      ? searchResults.map((filteredCountry,i) => 
+        <li key={i}>
+        {filteredCountry.countryName.common}
+      </li>
+     )
+     :searchResults.length === 1
+     ? <DetailedCountry filteredCountry={searchResults[0]}/>
+     : <div>Too many matches, specify another filter</div>
+
+    }
+      </div>
+      <Footer />
     </div>
   )
 }
