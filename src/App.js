@@ -4,6 +4,7 @@ import Numbers from './components/Phonebook'
 import noteService from './services/notes'
 import personService from './services/phonebook'
 import Footer from './components/Footer'
+import DetailedCountry from './components/DetailedCountry'
 import axios from 'axios'
 
 const App = (props ) => {
@@ -95,7 +96,7 @@ const PersonNotification = ({personMessage}) =>{
    return null
   }
   return(
-   <div className='error'>
+   <div className='errorNumbers'>
      {personMessage}
    </div>
   )
@@ -175,9 +176,9 @@ const deletePhoneId = (id) => {
   personService
   .deletePersonWithId(id)
   .then(returnedPerson => {
-    setPerson(returnedPerson)
+    setPerson(person.filter(currentPerson => currentPerson.id !== id))
     setPersonMessage(
-      `${pers.name} was already deleted`
+      `${pers.name} deleted`
     )
     setTimeout(() => {
       setPersonMessage(null)
@@ -206,11 +207,7 @@ const [countryInput, setCountryInput] = useState('a')
 
 const [countries, setCountries] = useState([])
 
-const countriesArray = countries.map(c => c.name)
-
-const commonName = countriesArray.map(c => c.common)
-
-//const basicData = countries.map(c => ['languages': c.languages,'capital': c.capital])
+const [countriesData, setCountriesData] = useState([])
 
 const [searchResults, setSearchResults] = useState([])
 
@@ -228,14 +225,28 @@ useEffect(() => {
     )
 }, [])
 
-useEffect(() =>{
-  setSearchResults(commonName
-  .filter((country, i) => country
-  .toLowerCase()
-  .includes(countryInput)))
-}, [countryInput])
+useEffect(() => {
+  let data = countries.map(country => 
+    {return {
+    countryName: country.name,
+    countryLanguage: country.languages,
+    countryCapital: country.capital,
+    countryArea: country.area,
+    countryFlag: country.flag
+  }})
 
-// console.log(countriesArray)
+  setCountriesData(data)
+}, [countries])
+
+useEffect(() =>{
+  setSearchResults(countriesData
+  .filter((country, i) => {
+    console.log(country)
+    return country.countryName.common.toLowerCase().includes(countryInput)
+  }))
+}, [countryInput]) //monitoring country input
+
+console.log(countriesData)
 
   return (
     <div>
@@ -320,25 +331,21 @@ useEffect(() =>{
       value={countryInput}
       onChange={handleCountries}
       />
-
+{/* 
       {searchResults.length < 10 
       ? <div> Less than 10 </div> 
       : searchResults.length < 20 
       ? <div> less than 20 </div> 
-      : <div> more than 20 </div>}
+      : <div> more than 20 </div>} */}
 
-      {searchResults.length < 10
+      {searchResults.length < 10 && searchResults.length > 1
       ? searchResults.map((filteredCountry,i) => 
         <li key={i}>
-        {filteredCountry}
+        {filteredCountry.countryName.common}
       </li>
      )
      :searchResults.length === 1
-     ? countriesArray.map((filteredCountry,i) => 
-     <li key={i}>
-     {filteredCountry}
-   </li>
-  )
+     ? <DetailedCountry filteredCountry={searchResults[0]}/>
      : <div>Too many matches, specify another filter</div>
 
     }
