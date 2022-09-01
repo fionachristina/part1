@@ -5,6 +5,7 @@ const Footer =() =>{
         color: 'green',
         fontStyle: 'italic',
         fontSize: 16
+        //this is a test
     }
 
     return(
