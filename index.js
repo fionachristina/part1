@@ -1,24 +1,23 @@
-const { response, request } = require('express')
 const express = require('express')
 const morgan = require('morgan')
 const app = express()
 
-const requestLogger = (request, response, next) => {
-    console.log('Method:', request.method)
-    console.log('Path:  ', request.path)
-    console.log('Body:  ', request.body)
-    console.log('---')
-    next()
-  }
+// const requestLogger = (request, response, next) => {
+//     console.log('Method:', request.method)
+//     console.log('Path:  ', request.path)
+//     console.log('Body:  ', request.body)
+//     console.log('---')
+//     next()
+//   }
 
   app.use(express.json())
-app.use(requestLogger)
+// app.use(requestLogger)
 
-  const unknownEndpoint = (request, response) => {
-    response.status(404).send({ error: 'unknown endpoint' })
-  }
+// const unknownEndpoint = (request, response) => {
+//     response.status(404).send({ error: 'unknown endpoint' })
+//   }
   
-  app.use(unknownEndpoint)
+//   app.use(unknownEndpoint)
 
 let notes = [  
     {    
