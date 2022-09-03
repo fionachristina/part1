@@ -2,7 +2,7 @@ POST http://localhost:3001/api/notes HTTP/1.1
 content-type: application/json
 
 {
-    "content": "rest testing post",
+    "content": "no",
     "important": "true"
 }
 
@@ -11,8 +11,17 @@ GET http://localhost:3001/api/notes/
 
 ###
 DELETE http://localhost:3001/api/notes/2
+
 ###
-DELETE http://localhost:3001/api/persons/4
+PUT http://localhost:3001/api/notes/6313393497dca8dd488d0353 HTTP/1.1
+content-type: application/json
+
+{
+    "content": "ok",
+    "important": "false"
+}
+###
+DELETE http://localhost:3001/api/persons/63136bcf5ae76dfff29aa32e
 ###
 POST http://localhost:3001/api/persons/ HTTP/1.1
 Content-Type: application/json
@@ -23,3 +32,12 @@ Content-Type: application/json
 }
 ###
 GET http://localhost:3001/api/persons/
+
+###
+PUT http://localhost:3001/api/persons/63134617502ae3ea04122e13 HTTP/1.1
+content-type: application/json
+
+{
+    "name": "ok",
+    "number": "679"
+}
