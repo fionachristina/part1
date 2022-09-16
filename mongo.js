@@ -5,9 +5,9 @@ const mongoose = require('mongoose')
 //   process.exit(1)
 // }
 
-const password = process.argv[2]
+//const password = process.argv[2]
 
-const url = `mongodb+srv://fullstack:fiona0304@cluster0.lds4bgh.mongodb.net/noteApp?retryWrites=true&w=majority`
+const url = 'mongodb+srv://fullstack:fiona0304@cluster0.lds4bgh.mongodb.net/noteApp?retryWrites=true&w=majority'
 
 const noteSchema = new mongoose.Schema({
   content: String,
@@ -19,7 +19,7 @@ const Note = mongoose.model('Note', noteSchema)
 
 mongoose
   .connect(url)
-  .then((result) => {
+  .then(() => {
     console.log('connected')
 
     const note = new Note({

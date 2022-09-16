@@ -3,8 +3,7 @@ const mongoose = require('mongoose')
 if (process.argv.length < 3) {
   console.log('Please provide the password as an argument: node mongo.js <password>')
   process.exit(1)
-} 
-
+}
 
 const password = process.argv[2]
 const name = process.argv[3]
@@ -22,29 +21,28 @@ const Phone = mongoose.model('Phone', phoneSchema)
 
 mongoose
   .connect(url)
-  .then((result) => {
+  .then(() => {
     console.log('connected')
-    if (process.argv.length == 3){
-        Phone.find({}).then(result => { console.log('PhoneBook:')
-            result.forEach(phone => {
-              console.log(phone.name, phone.number)
-            })
-            mongoose.connection.close()
-          })
+    if (process.argv.length === 3){
+      Phone.find({}).then(result => { console.log('PhoneBook:')
+        result.forEach(phone => {
+          console.log(phone.name, phone.number)
+        })
+        mongoose.connection.close()
+      })
     } else{
-        const phone = new Phone({
-            name: name,
-            number: number,
-          })
-      
-          return phone.save()
-          .then(() => {
-            console.log(`Added ${name} number ${number} to phonebook!`)
-            return mongoose.connection.close()
-          })
-          .catch((err) => console.log(err))
-    }  
-  })
- 
+      const phone = new Phone({
+        name: name,
+        number: number,
+      })
 
- 
+      return phone.save()
+        .then(() => {
+          console.log(`Added ${name} number ${number} to phonebook!`)
+          return mongoose.connection.close()
+        })
+        .catch((err) => console.log(err))
+    }
+  })
+
+
