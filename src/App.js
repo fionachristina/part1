@@ -15,7 +15,7 @@ const App = (props ) => {
     'a new note...'
     )
   
-  const [errorMessage, setErrorMessage] = useState('some error happened...')
+  const [errorMessage, setErrorMessage] = useState('Notes notification...')
   
   const addNote = (event) =>{
     event.preventDefault()
@@ -121,17 +121,19 @@ event.preventDefault()
         ? p
         : returnedPerson
         ))
-        setPersonMessage(
-          `${newNumber} has replaced ${no.number} for ${no.name}`
-         )
-         setTimeout(() => {
+        setPersonMessage(`${newNumber} has replaced ${no.number} for ${no.name}`)
+        setTimeout(() => {
           setPersonMessage(null)
-         }, 5000);
+        }, 5000);
       })
       .catch(error =>{ 
-        alert(`error occured when updating`)
+        setPersonMessage(error.response.data.error)
+      setTimeout(() => {
+        setPersonMessage(null)
+      }, 5000);
       })
     : alert(`${newName}'s number has not been replaced`)
+      
   }
   else{
     personService
@@ -146,7 +148,10 @@ event.preventDefault()
       }, 5000);
     })
     .catch(error =>{
-      alert(`error occured when adding`)
+      setPersonMessage(error.response.data.error)
+      setTimeout(() => {
+        setPersonMessage(null)
+      }, 5000);
     })
   }
   setNewName('')
@@ -185,7 +190,12 @@ const deletePhoneId = (id) => {
     }, 5000);
   })
   .catch(error => {
-    alert(`${pers.name} was already deleted`)
+    setPersonMessage(
+      `${pers.name} was already deleted`
+    )
+    setTimeout(() => {
+      setPersonMessage(null)
+    }, 5000);
   })
 }
 

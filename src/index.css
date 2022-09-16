@@ -20,7 +20,7 @@ h1{
 }
 
 .errorNumbers{
-    color: green;
+    color: red;
     background: lightgrey;
     font-size: 20px;
     border-style: solid;
